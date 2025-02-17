@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  ########################
+  ## SELECTABLE SYSTEMS ##
+  ########################
+  skipper-front:
+    container_name: skipper-front
+    build:
+      context: ./systems/skipper-front
+      dockerfile: Dockerfile.local
+    volumes:
+      - ./systems/skipper-front:/app
+    working_dir: /app
+    command: ash -c "npm install && npm run dev"
+    ports:
+      - "3000:3000"
+
+  skipper-api:
+    container_name: skipper-api
+    build:
+      context: ./systems/skipper-api
+      dockerfile: Dockerfile.local
+    volumes:
+      - ./systems/skipper-api:/app
+    working_dir: /app
+    command: ash -c "npm install && npm run start:dev"
+    environment:
+      PORT: 8080
+    ports:
+      - "8080:3000"
+    depends_on:
+      - postgres
+
+  ##################
+  ## BASE SYSTEMS ##
+  ##################
+  postgres:
+    image: postgres
+    restart: always
+    container_name: skipper-postgres
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: skipperdb
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: skipperpgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    attach:
+      false
+
+volumes:
+  postgres-data:
