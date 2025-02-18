@@ -60,35 +60,6 @@ install_systems() {
     done
 }
 
-install_systems_hooks() {
-    readonly exclude_systems=("$POSTGRES" "$PGADMIN")
-
-    echo -e "\n\e[48;5;22mInstalling hooks... \e[0m"
-
-    for system in "${user_input[@]}"; do
-        if [[ ! "$exclude_systems" == *"$system"* ]]; then # Check if the system is not in the exclude list
-            cp ./hooks/pre-commit ./systems/$system/.git/hooks/pre-commit
-
-            SUDO="docker"
-            # Check if in Linux Docker needs sudo
-            if [ $OSTYPE == "linux-gnu" ] && ! id -nG "$USER" | grep -qw docker; then
-                SUDO="sudo docker"
-            fi
-
-            # Replace texts with sed. In MacOS add an empty string after -i
-            if [[ "$OSTYPE" == "darwin"* ]]; then
-                sed -i '' "s/sudoDockerReplace/${SUDO}/g" ./systems/$system/.git/hooks/pre-commit
-                sed -i '' "s/appNameReplace/${system}/g" ./systems/$system/.git/hooks/pre-commit
-            else
-                sed -i "s/sudoDockerReplace/${SUDO}/g" ./systems/$system/.git/hooks/pre-commit
-                sed -i "s/appNameReplace/${system}/g" ./systems/$system/.git/hooks/pre-commit
-            fi
-
-            chmod +x ./systems/$system/.git/hooks/pre-commit
-            echo -e "\e[32m\u2714\e[0m $system hook installed"
-        fi
-    done
-}
 
 add_systems_tools() {
     # No additional tools needed for skipper systems
@@ -112,8 +83,6 @@ IFS=' ' read -r -a user_input <<< "$read_user_input"
 verify_user_input ""
 
 install_systems ""
-
-install_systems_hooks ""
 
 add_systems_tools ""
 
