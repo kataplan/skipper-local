@@ -20,6 +20,7 @@ You don't have to worry about anything, just follow the instructions and **Futur
 |-------------------|------|
 | skipper-api       | 8080 |
 | skipper-front WIP | 3000 |
+|-------------------|------|
 
 ## Run commands inside the docker container
 All the commands, like installing a new library in a software, must run inside the docker container.
